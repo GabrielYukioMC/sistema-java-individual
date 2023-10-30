@@ -2,14 +2,17 @@ package sistemaCaptura;
 
 import com.github.britooo.looca.api.core.Looca;
 
+import java.io.IOException;
+import org.json.JSONObject;
 import org.springframework.jdbc.core.JdbcTemplate;
 import sistemaCaptura.conexao.Conexao;
 import sistemaCaptura.telasSistema.TelaMonitorDeRecursos;
+import org.json.JSONObject;
 
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -46,32 +49,30 @@ public class HistConsmRecurso {
     }
 
     public void mostarHistorico(Integer tipo, Integer idMaquina) {
-        switch (tipo){
-            case 1 ->{
+        switch (tipo) {
+            case 1 -> {
                 telaMonitorDeRecursos.gerarTelaMonitor(idMaquina);
                 insertHistorico(idMaquina);
                 MonitorarSoftware(idMaquina);
             }
 
             case 2 -> {
-                System.out.println("Dashboard");
+                System.out.println("Dashboard - prototipo 70%");
+
+                  telaMonitorDeRecursos.BarChart(idMaquina);
                 insertHistorico(idMaquina);
                 MonitorarSoftware(idMaquina);
-
             }
-            case 3-> {
+            case 3 -> {
                 System.out.println("Sistema funcionando sem tela de monitoramento");
                 insertHistorico(idMaquina);
                 MonitorarSoftware(idMaquina);
-
-
             }
-            case 4->{
+            case 4 -> {
                 pararSistema();
             }
             default -> System.out.println("Opção invalida!");
         }
-
 
 
     }
@@ -92,7 +93,6 @@ public class HistConsmRecurso {
                 dataHora = LocalDateTime.now();
 
 
-                // Inserir dados no banco
                 con.update("INSERT INTO historico (dataHora, consumo, qtdJanelasAbertas, fkComponente, fkHardware, fkMaquina) VALUES(?, ?, ?, ?, ?, ?)", dataHora, consumoCpu, qtdJanelasAbertas, 1, 1, idMaquina);
 
                 con.update("INSERT INTO historico (dataHora, consumo, qtdJanelasAbertas, fkComponente, fkHardware, fkMaquina) VALUES(?, ?, ?, ?, ?, ?)", dataHora, consumoRam, qtdJanelasAbertas, 2, 2, idMaquina);
@@ -107,6 +107,7 @@ public class HistConsmRecurso {
         }, 0, 2000);
 
     }
+
 
     public void MonitorarSoftware(Integer idMaquina) {
 
@@ -135,10 +136,10 @@ public class HistConsmRecurso {
                             dataHora = LocalDateTime.now();
                             motivo += processo;
                             con.update("INSERT INTO strike(dataHora,validade,motivo,fkMaquina) VALUES (?,?,?,?)", dataHora, 1, motivo, idMaquina);
-                            System.out.println("levou Strike");
+                            enviarNotificacao(processo);
                         }
                     }
-                } catch (IOException e) {
+                } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
             }
@@ -146,6 +147,17 @@ public class HistConsmRecurso {
         // roda a cada 10 segundos
     }
 
+    private void enviarNotificacao(String processo)throws IOException, InterruptedException {
+
+            String mensagemAlerta = "O usuario esta com o processo  " + processo +" aberto !!";
+
+        JSONObject json = new JSONObject();
+
+        json.put("text",mensagemAlerta) ;
+
+        BotSlack.sendMessage(json);
+
+    }
 
     public void pararSistema() {
         System.out.println("Parando sistema...");

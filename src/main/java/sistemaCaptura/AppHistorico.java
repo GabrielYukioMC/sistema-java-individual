@@ -1,27 +1,14 @@
 package sistemaCaptura;
 
-
-import java.io.IOException;
-
-import org.json.JSONObject;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import sistemaCaptura.conexao.Conexao;
-
 
 import java.util.List;
 import java.util.Scanner;
 
 public class AppHistorico {
-    public static void main(String[] args) throws IOException, InterruptedException {
-
-
-        JSONObject json = new JSONObject();
-
-        json.put("text", "pokemon teste " +
-                "\ncom quebra de linha ");
-
-        BotSlack.sendMessage(json);
+    public static void main(String[] args) {
 
 
         Conexao conexao = new Conexao();
@@ -93,7 +80,7 @@ public class AppHistorico {
                                         System.out.println("""
                                                 Escolha uma opção 
                                                 1- Tela
-                                                2- Dashboard
+                                                2- Dashboard - prototipo 70%
                                                 3- Sem Visualização
                                                 4- Sair""");
                                         System.out.println("-".repeat(15));

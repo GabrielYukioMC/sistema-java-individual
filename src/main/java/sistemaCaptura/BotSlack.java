@@ -11,7 +11,7 @@ import org.json.JSONObject;
 public class BotSlack {
 
     private static final HttpClient client = HttpClient.newHttpClient();
-    private static final String URL = "https://hooks.slack.com/services/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";
+    private static final String URL = "https://hooks.slack.com/services/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";
 
     public static void sendMessage(JSONObject content) throws IOException, InterruptedException {
 
@@ -23,7 +23,10 @@ public class BotSlack {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        System.out.println(String.format("Status: %s", response.statusCode()));
-        System.out.println(String.format("Response: %s", response.body()));
+if (response.statusCode()!=200){
+    System.out.println(String.format("Status: %s", response.statusCode()));
+    System.out.println(String.format("Response: %s", response.body()));
+}
+
     }
 }
